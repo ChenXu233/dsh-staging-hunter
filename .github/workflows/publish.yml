@@ -1,0 +1,53 @@
+name: publish
+
+# 触发方式
+#   1. GitHub Release published —— 会校验 tag 与 package.json 版本一致
+#   2. 手动 workflow_dispatch —— 急用时从 Actions 页面点一下
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write        # OIDC：npm Trusted Publishing 与 provenance 都需要
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      # Trusted Publishing 要求 npm >= 11.5，runner 自带的可能更旧
+      - name: Upgrade npm
+        run: npm install -g npm@latest && npm -v
+
+      - name: Verify tag matches package.json version
+        if: github.event_name == 'release'
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          VER="$(node -p "require('./package.json').version")"
+          echo "tag=$TAG  version=$VER"
+          if [ "$TAG" != "$VER" ]; then
+            echo "::error::tag $TAG does not match package.json version $VER"
+            exit 1
+          fi
+
+      - name: Test
+        run: npm test
+
+      # 没有 NODE_AUTH_TOKEN —— 走 OIDC Trusted Publishing。
+      # 若尚未在 npmjs.com 配好 Trusted Publisher，可临时改用 token：
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish
+        run: npm publish --access public --provenance

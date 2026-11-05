@@ -1,5 +1,8 @@
 # dsh-staging-hunter
 
+[![npm](https://img.shields.io/npm/v/dsh-staging-hunter.svg)](https://www.npmjs.com/package/dsh-staging-hunter)
+[![publish](https://github.com/ChenXu233/dsh-staging-hunter/actions/workflows/publish.yml/badge.svg)](https://github.com/ChenXu233/dsh-staging-hunter/actions/workflows/publish.yml)
+
 让 DSH 桌面端**永远落在夜间版灰度的第一批**。
 
 ## 它解决什么问题
@@ -38,11 +41,21 @@ return percentage < stagingPercentage   // 严格小于
 | `updaterIdPath` | `''` | `.updaterId` 路径覆盖；留空自动探测 |
 | `checkIntervalMs` | `60000` | 巡检间隔；`0` 表示只靠 fs.watch |
 
-## 安装（本仓库未自动写入你的 profile）
+## 安装
 
-本插件**没有**注册进 `~/.dsh/profiles/desktop`。要启用时二选一：
+### 从 npm（推荐）
 
-### A. 作为 bundle 包（推荐）
+```bash
+dsh plugin add dsh-staging-hunter
+```
+
+按提示批准后重启 DSH，插件会自动挑一个低位桶 UUID 并通过 `fs.watch` 守住它。
+
+### 从源码 / 手工挂进 profile
+
+本仓库不会自动写入你的 profile。二选一：
+
+#### A. 作为 bundle 包
 
 ```bash
 # 1) 放进 profile 的 node_modules（目录联接，不触发 pnpm 重装）
@@ -52,7 +65,7 @@ cmd //c mklink /J "%USERPROFILE%\.dsh\profiles\desktop\node_modules\dsh-staging-
 #    dsh.profile.bundles 里各加一行 "dsh-staging-hunter"
 ```
 
-### B. 直接写进 profile 的补丁层
+#### B. 直接写进 profile 的补丁层
 
 在 `~/.dsh/profiles/desktop/cordis.patch.yml` 追加：
 
@@ -79,3 +92,17 @@ cmd //c mklink /J "%USERPROFILE%\.dsh\profiles\desktop\node_modules\dsh-staging-
   在下一次启动的更新检查中才生效。
 - **nightly 有风险**：你会稳定收到 rc 版本，可能遇到崩溃或破坏性变更。
 - **副作用**：你不在圈内时，旧行为是「停在当前版本」；现在会持续跟进最新 nightly。
+## 发布
+
+npm 包通过 GitHub Actions 的 **Trusted Publishing**（OIDC）发布，仓库里不存任何 token。
+
+```bash
+# 1) 改版本号并提交
+npm version patch -m "release: v%s"
+# 2) 推送提交与 tag
+git push --follow-tags
+# 3) 在 GitHub 上发布对应 tag 的 Release —— Actions 会校验 tag == package.json 版本，跑测试后发布
+```
+
+首次发布（包在 npm 上还不存在时）需在本地 `npm login` 后手动 `npm publish --access public`；
+之后在 npmjs.com 的包设置里把 Trusted Publisher 指到 `ChenXu233/dsh-staging-hunter` 与 `publish.yml`，后续版本即可全自动。

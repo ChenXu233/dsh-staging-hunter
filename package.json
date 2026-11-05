@@ -13,6 +13,7 @@
   "files": [
     "lib/index.js",
     "cordis.patch.yml",
+    "test/smoke.mjs",
     "README.md",
     "LICENSE"
   ],
@@ -29,7 +30,8 @@
     "node": ">=18"
   },
   "scripts": {
-    "test": "node test/smoke.mjs"
+    "test": "node test/smoke.mjs",
+    "prepublishOnly": "node test/smoke.mjs"
   },
   "author": "ChenXu233",
   "repository": {
@@ -49,5 +51,8 @@
         "0.2.1-rc.5": "compatible"
       }
     }
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
