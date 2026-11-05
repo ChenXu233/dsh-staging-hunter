@@ -1,0 +1,53 @@
+{
+  "name": "dsh-staging-hunter",
+  "version": "0.1.0",
+  "description": "让 DSH 桌面端永远落在夜间版灰度第一批：维持 .updaterId 的低位桶值，并在被改回随机值时自动修正。",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/index.js",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "cordis",
+    "updater",
+    "staging",
+    "nightly"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node test/smoke.mjs"
+  },
+  "author": "ChenXu233",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChenXu233/dsh-staging-hunter.git"
+  },
+  "homepage": "https://github.com/ChenXu233/dsh-staging-hunter#readme",
+  "bugs": {
+    "url": "https://github.com/ChenXu233/dsh-staging-hunter/issues"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "compatibility": {
+      "dshReleases": {
+        "0.2.1-rc.5": "compatible"
+      }
+    }
+  }
+}

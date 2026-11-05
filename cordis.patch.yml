@@ -1,0 +1,7 @@
+# dsh-staging-hunter 的 bundle patch —— 把插件挂进 DSH 配置树。
+#
+# 这是「挂载声明」，DSH 启动时按 bundle 层栈叠加成配置树。
+#   insert: 新增插件行；id 必须全局唯一且与包名一致，name 解析到包入口。
+- insert:
+    - id: dsh-staging-hunter
+      name: 'dsh-staging-hunter'
